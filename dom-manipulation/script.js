@@ -1,3 +1,44 @@
+const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
+setInterval(syncWithServer, 30000); // fetch every 30 seconds
+async function syncWithServer() {
+    try {
+      const response = await fetch(SERVER_URL);
+      const serverPosts = await response.json();
+  
+      const serverQuotes = serverPosts.map(post => ({
+        text: post.body,
+        category: post.title
+      }));
+  
+      const localQuotes = JSON.parse(localStorage.getItem("quotes")) || [];
+  
+      const newQuotes = serverQuotes.filter(serverQuote =>
+        !localQuotes.some(localQuote => localQuote.text === serverQuote.text)
+      );
+  
+      if (newQuotes.length > 0) {
+        const merged = [...localQuotes, ...newQuotes];
+        localStorage.setItem("quotes", JSON.stringify(merged));
+        quotes = merged;
+        populateCategories();
+        notifyUser(`${newQuotes.length} new quotes were synced from server.`);
+      }
+  
+    } catch (error) {
+      console.error("Error syncing with server:", error);
+    }
+}
+function notifyUser(message) {
+    const bar = document.getElementById("notificationBar");
+    bar.textContent = message;
+    bar.style.display = "block";
+  
+    setTimeout(() => {
+      bar.style.display = "none";
+    }, 5000);
+  }
+  
+  
 // Quote data structure
 const quotes = [
     { text: "The journey of a thousand miles begins with one step.", category: "Motivation" },
@@ -199,6 +240,28 @@ document.addEventListener("DOMContentLoaded", () => {
     const lastQuote = JSON.parse(last);
     quoteDisplay.innerHTML = `<p>"${lastQuote.text}"</p><em>Category: ${lastQuote.category}</em>`;
   }
+  document.addEventListener("DOMContentLoaded", () => {
+    loadQuotes();
+    populateCategories();
+    newQuoteBtn.addEventListener("click", filterQuotes);
+    addQuoteBtn.addEventListener("click", addQuote);
+  
+    const last = sessionStorage.getItem("lastQuote");
+    if (last && categoryFilter.value === "all") {
+      const lastQuote = JSON.parse(last);
+      quoteDisplay.innerHTML = `<p>"${lastQuote.text}"</p><em>Category: ${lastQuote.category}</em>`;
+    }
+  });
+  document.addEventListener("DOMContentLoaded", () => {
+    loadQuotes();                // local quotes from storage
+    populateCategories();        // setup filter
+    syncWithServer();            // initial fetch
+    setInterval(syncWithServer, 30000); // periodic sync
+  
+    newQuoteBtn.addEventListener("click", filterQuotes);
+    addQuoteBtn.addEventListener("click", addQuote);
+  });
+  
 });
 
   // Event Listeners
