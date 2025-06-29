@@ -18,6 +18,23 @@
     <button id="addQuoteBtn">Add Quote</button>
   </div>
     <button id="newQuote">Show New Quote</button>
+    <h1>Dynamic Quote Generator</h1>
+
+  <div id="quoteDisplay"></div>
+  <button id="newQuote">Show New Quote</button>
+
+  <!-- Add Quote Section -->
+  <div style="margin-top: 20px;">
+    <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
+    <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
+    <button id="addQuoteBtn">Add Quote</button>
+  </div>
+
+  <!-- Import/Export -->
+  <div style="margin-top: 20px;">
+    <button onclick="exportToJsonFile()">Export Quotes</button>
+    <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
+  </div>
     <script src="C:\Users\user\alx_fe_javascript\dom-manipulation\script.js"></script>
   </body>
   </html>
